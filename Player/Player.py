@@ -81,22 +81,48 @@ class SmartPlayer(Player):
             for val in board_data:                
                 self.maxFun(val, board_data.copy())
         elif letter == "O":
-            pass
+            for val in board_data:                
+                self.minFun(val, board_data.copy())
     
     def maxFun(self, pos, board_data):          
+        board_data[pos] = self.letter
         if self.is_winner(self.letter):
             utility = self.utilityFun(board_data, self.WIN)
-            return utility
+            return {utility:board_data}
         if self.drawEval(board_data):
-            return 0
-        availSpaces = board_data
-        print("Max-spaces:",availSpaces)
-        # self.minFun()
+            return {0:board_data}                
+        l = []
+        for val in board_data:
+            ans_dict = self.minFun(val, board_data.copy())
+            l.append(ans_dict)
+        mink=math.inf
+        boardk = []
+        for d in l:
+            for x,y in d.items():
+                if x<mink:
+                    mink=x
+                    boardk=y
+        ans = {mink, boardk}
+        return ans
+            
     
     def minFun(self, pos, board_data):
         if self.is_winner(self.letter):
             utility = self.utilityFun(board_data, self.WIN)
             return utility
         if self.drawEval(board_data):
-            return 0
+            return {0:board_data}
+        l = []
+        for val in board_data:
+            ans_dict = self.maxFun(val, board_data.copy())
+            l.append(ans_dict)
+        maxk=-math.inf
+        boardk = []
+        for d in l:
+            for x,y in d.items():
+                if x>maxk:
+                    maxk=x
+                    boardk=y
+        ans = {maxk, boardk}
+        return ans
                 
