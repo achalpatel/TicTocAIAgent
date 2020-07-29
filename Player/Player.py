@@ -45,56 +45,50 @@ class SmartPlayer(Player):
     DRAW = "draw"
     def __init__(self, board, letter):
         super().__init__(board)
-        self.letter = letter        
+        self.letter = letter
+        self.opp_letter = ""
+        if self.letter == "X":
+            self.opp_letter = "O"
+        else:
+            self.opp_letter = "X"
         print("smart letter",self.letter)
 
     def next_move(self):
         avail_space = self.board.available_space()
         print("availspace from nextMove:",avail_space)
 
-    def is_winner(self, letter):
-        return self.board.is_winner(letter)
-                    
+    def is_winner(self, letter, board_list):
+        return self.board.is_winner(letter, board_list)
+
+    def is_opponent_winner(self, board_list):
+        return self.board.is_winner(self.opp_letter, board_list)
+
     def available_moves(self):
         self.availMoves = self.board.available_space()
     
-    def utilityFun(self, board_data, response):
-        numberOfSpaceAvail = len(board_data)
+    def available_space_player(self, board_list):
+        return [i for i, x in enumerate(board_list) if x == '-']
+
+    def utilityFun(self, board_free_space, response):
+        numberOfSpaceAvail = len(board_free_space)
         utility = 0
         if response == self.WIN:
-            utility += (1 + numberOfSpaceAvail) * (1)
+            utility = (1 + numberOfSpaceAvail) * (1)
+            print("utility",numberOfSpaceAvail, utility)
             return utility
-        if response == self.LOSE:
-            utility += (1 + numberOfSpaceAvail) * (-1)
+        elif response == self.LOSE:
+            utility = (1 + numberOfSpaceAvail) * (-1)
+            print("utility",numberOfSpaceAvail, utility)
             return utility
         return utility
         # print("utility - availSpace:",numberOfSpaceAvail)
 
-    def drawEval(self, board_data):
-        if len(board_data)<=0:
+    def drawEval(self, board_free_space, board_list):
+        if not (self.is_winner(self.letter, board_list) or self.is_opponent_winner(board_list)) and len(board_free_space)<=0:
             return True
         return False
 
-    def minimax(self, letter):
-        board_data = self.board.available_space()
-        if letter == "X":            
-            for val in board_data:                
-                self.maxFun(val, board_data.copy())
-        elif letter == "O":
-            for val in board_data:                
-                self.minFun(val, board_data.copy())
-    
-    def maxFun(self, pos, board_data):          
-        board_data[pos] = self.letter
-        if self.is_winner(self.letter):
-            utility = self.utilityFun(board_data, self.WIN)
-            return {utility:board_data}
-        if self.drawEval(board_data):
-            return {0:board_data}                
-        l = []
-        for val in board_data:
-            ans_dict = self.minFun(val, board_data.copy())
-            l.append(ans_dict)
+    def findMin(self, l):
         mink=math.inf
         boardk = []
         for d in l:
@@ -102,20 +96,10 @@ class SmartPlayer(Player):
                 if x<mink:
                     mink=x
                     boardk=y
-        ans = {mink, boardk}
+        ans = {mink:boardk}
         return ans
-            
     
-    def minFun(self, pos, board_data):
-        if self.is_winner(self.letter):
-            utility = self.utilityFun(board_data, self.WIN)
-            return utility
-        if self.drawEval(board_data):
-            return {0:board_data}
-        l = []
-        for val in board_data:
-            ans_dict = self.maxFun(val, board_data.copy())
-            l.append(ans_dict)
+    def findMax(self, l):
         maxk=-math.inf
         boardk = []
         for d in l:
@@ -123,6 +107,86 @@ class SmartPlayer(Player):
                 if x>maxk:
                     maxk=x
                     boardk=y
-        ans = {maxk, boardk}
+        ans = {maxk:boardk}
+        return ans
+
+    def minimax(self, letter):
+        board_free_space = self.board.available_space()
+        board_list = self.board.board_data
+        if letter == "X":
+            l = []
+            for val in board_free_space:                
+                ans_dict = self.maxFun(val, board_list.copy())
+                l.append(ans_dict)
+            ans = self.findMax(l)
+            print(ans)
+            return ans
+        elif letter == "O":
+            l = []
+            for val in board_free_space:                
+                ans_dict = self.minFun(val, board_list.copy())
+                l.append(ans_dict)
+            ans = self.findMin()
+            print(ans)
+            return ans
+    
+    def maxFun(self, pos, board_list):          
+        board_list[pos] = self.letter
+        board_free_space = self.available_space_player(board_list)
+        print("Max",board_list,board_free_space)
+        if self.is_winner(self.letter, board_list):
+            utility = self.utilityFun(board_free_space, self.WIN)
+            print("W:",utility)
+            return {utility:board_list}
+        if self.is_opponent_winner(board_list):
+            utility = self.utilityFun(board_free_space, self.LOSE)
+            print("L:",utility)
+            return {utility:board_list}
+        if self.drawEval(board_free_space, board_list):
+            return {0:board_list}                
+        l = []
+        
+        for val in board_free_space:
+            ans_dict = self.minFun(val, board_list.copy())
+            l.append(ans_dict)
+        # maxk=-math.inf
+        # boardk = []
+        # for d in l:
+        #     for x,y in d.items():
+        #         if x>maxk:
+        #             maxk=x
+        #             boardk=y
+        # ans = {maxk:boardk}
+        ans = self.findMax(l)
+        return ans
+            
+    
+    def minFun(self, pos, board_list):
+        board_list[pos] = self.opp_letter
+        board_free_space = self.available_space_player(board_list)
+        print("Min",board_list,board_free_space)
+        if self.is_winner(self.letter, board_list):
+            utility = self.utilityFun(board_free_space, self.WIN)
+            print("W:",utility)
+            return utility
+        if self.is_opponent_winner(board_list):
+            utility = self.utilityFun(board_free_space, self.LOSE)
+            print("L:",utility)
+            return {utility:board_list}
+        if self.drawEval(board_free_space, board_list):
+            return {0:board_list}        
+        l = []        
+        for val in board_free_space:
+            ans_dict = self.maxFun(val, board_list.copy())
+            l.append(ans_dict)
+        # mink=math.inf
+        # boardk = []
+        # for d in l:
+        #     for x,y in d.items():
+        #         if x<mink:
+        #             mink=x
+        #             boardk=y
+        # ans = {mink:boardk}
+        ans = self.findMin(l)
         return ans
                 

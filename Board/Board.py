@@ -71,25 +71,25 @@ class TerminalBoard(Board):
 		self.available_space()
 
 
-	def is_winner(self, letter):
+	def is_winner(self, letter, board_list):
 		index = 0
 		# checking for the row similarity
 		for i in range(3):
 			
-			row_set  = set(self.board_data[index: index+3])
+			row_set  = set(board_list[index: index+3])
 			if len(row_set) == 1 and (letter in row_set):
 				return True
 			index +=3
 
 		# checking for the column similarity	
 		for i in range(3):
-			if (self.board_data[i] == letter and self.board_data[i+3] == letter and self.board_data[i+6] == letter):
+			if (board_list[i] == letter and board_list[i+3] == letter and board_list[i+6] == letter):
 				return True	
 	
-		if (self.board_data[0] == letter and self.board_data[4] == letter and self.board_data[8] == letter):
+		if (board_list[0] == letter and board_list[4] == letter and board_list[8] == letter):
 			return True
 
-		if (self.board_data[2] == letter and self.board_data[4] == letter and self.board_data[6] == letter):
+		if (board_list[2] == letter and board_list[4] == letter and board_list[6] == letter):
 			return True			
 
 		return False 
@@ -102,7 +102,7 @@ class TerminalBoard(Board):
 				if self.h_letter == "X":
 					self.hp.next_move()	
 					self.draw_board()					
-					if self.is_winner("X"):
+					if self.is_winner("X", self.board_data):
 						print("X is the winner!")
 						exit()
 					self.next_turn = "O"
@@ -111,7 +111,7 @@ class TerminalBoard(Board):
 					self.smartPlayer.next_move()
 					self.draw_board()
 					self.smartPlayer.minimax("X")	
-					if self.is_winner("X"):
+					if self.is_winner("X", self.board_data):
 						print("X is the winner!")
 						exit()
 					self.next_turn = "O"
@@ -119,7 +119,7 @@ class TerminalBoard(Board):
 				if self.h_letter == "O":
 					self.hp.next_move()	
 					self.draw_board()
-					if self.is_winner("O"):
+					if self.is_winner("O", self.board_data):
 						print("O is the winner!")
 						exit()
 					self.next_turn = "X"
@@ -127,7 +127,7 @@ class TerminalBoard(Board):
 					# self.rcp.next_move()	
 					self.smartPlayer.next_move()
 					self.draw_board()
-					if self.is_winner("O"):
+					if self.is_winner("O", self.board_data):
 						print("O is the winner!")
 						exit()
 					self.next_turn = "X"
