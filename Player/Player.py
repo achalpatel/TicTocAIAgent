@@ -36,7 +36,13 @@ class HumanPlayer(Player):
     def next_move(self):
         print ("Please enter your move ", end = " ")
         square = input()
+        while not self.checkIfSpaceEmpty(square):
+            print("Please select empty space")
+            square = input()
         self.board.board_data[int(square)-1] = self.board.h_letter
+    
+    def checkIfSpaceEmpty(self, place):
+        return self.board.board_data[int(place)-1] == '-'
         
 class SmartPlayer(Player):
     WIN = "win"
