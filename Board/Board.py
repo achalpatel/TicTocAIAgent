@@ -110,7 +110,7 @@ class TerminalBoard(Board):
 					# self.rcp.next_move()
 					self.smartPlayer.next_move()
 					self.draw_board()
-					self.smartPlayer.minimax("X")	
+					# self.smartPlayer.minimax("X")	
 					if self.is_winner("X", self.board_data):
 						print("X is the winner!")
 						exit()
@@ -127,6 +127,7 @@ class TerminalBoard(Board):
 					# self.rcp.next_move()	
 					self.smartPlayer.next_move()
 					self.draw_board()
+					# self.smartPlayer.minimax("O")
 					if self.is_winner("O", self.board_data):
 						print("O is the winner!")
 						exit()

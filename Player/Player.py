@@ -8,7 +8,6 @@
 #   version: 1.0.0
 #----------------------------------------------------------------------------------------
 
-
 import math
 import random
 
@@ -30,7 +29,7 @@ class RandomComputerPlayer(Player):
 
 class HumanPlayer(Player):
     def __init__(self, board, letter):
-        super().__init__(board)
+        super().__init__(board)    
         self.letter = letter
         print("human letter",self.letter)
 
@@ -44,7 +43,7 @@ class SmartPlayer(Player):
     LOSE = "lose"
     DRAW = "draw"
     def __init__(self, board, letter):
-        super().__init__(board)
+        super().__init__(board)        
         self.letter = letter
         self.opp_letter = ""
         if self.letter == "X":
@@ -54,8 +53,11 @@ class SmartPlayer(Player):
         print("smart letter",self.letter)
 
     def next_move(self):
-        avail_space = self.board.available_space()
-        print("availspace from nextMove:",avail_space)
+        # avail_space = self.board.available_space()
+        # print("availspace from nextMove:",avail_space)
+        ans = self.minimax(self.letter)
+        self.board.board_data[ans] = self.letter
+
 
     def is_winner(self, letter, board_list):
         return self.board.is_winner(letter, board_list)
@@ -74,11 +76,11 @@ class SmartPlayer(Player):
         utility = 0
         if response == self.WIN:
             utility = (1 + numberOfSpaceAvail) * (1)
-            print("utility",numberOfSpaceAvail, utility)
+            # print("utility",numberOfSpaceAvail, utility)
             return utility
         elif response == self.LOSE:
             utility = (1 + numberOfSpaceAvail) * (-1)
-            print("utility",numberOfSpaceAvail, utility)
+            # print("utility",numberOfSpaceAvail, utility)
             return utility
         return utility
         # print("utility - availSpace:",numberOfSpaceAvail)
@@ -111,24 +113,41 @@ class SmartPlayer(Player):
         return ans
 
     def minimax(self, letter):
-        board_free_space = self.board.available_space()
-        board_list = self.board.board_data
+        board_free_space = self.board.available_space()        
+        board_list = self.board.board_data.copy()
+        print("Free space:",board_free_space)
+        print("Board lIst: ", board_list)
         if letter == "X":
             l = []
+            local_dict = {}
             for val in board_free_space:                
                 ans_dict = self.maxFun(val, board_list.copy())
                 l.append(ans_dict)
+                for k in ans_dict.keys():
+                    local_dict[k] = val
             ans = self.findMax(l)
             print(ans)
-            return ans
+            key_val=0
+            for k in ans.keys():
+                key_val=local_dict[k]
+                print(key_val)
+            return key_val
+
         elif letter == "O":
             l = []
+            local_dict = {}
             for val in board_free_space:                
                 ans_dict = self.minFun(val, board_list.copy())
                 l.append(ans_dict)
-            ans = self.findMin()
+                for k in ans_dict.keys():
+                    local_dict[k] = val
+            ans = self.findMin(l)
             print(ans)
-            return ans
+            key_val=0
+            for k in ans.keys():
+                key_val=local_dict[k]
+                print(key_val)
+            return key_val
     
     def maxFun(self, pos, board_list):          
         board_list[pos] = self.letter
@@ -136,11 +155,11 @@ class SmartPlayer(Player):
         print("Max",board_list,board_free_space)
         if self.is_winner(self.letter, board_list):
             utility = self.utilityFun(board_free_space, self.WIN)
-            print("W:",utility)
+            # print("W:",utility)
             return {utility:board_list}
         if self.is_opponent_winner(board_list):
             utility = self.utilityFun(board_free_space, self.LOSE)
-            print("L:",utility)
+            # print("L:",utility)
             return {utility:board_list}
         if self.drawEval(board_free_space, board_list):
             return {0:board_list}                
@@ -167,11 +186,11 @@ class SmartPlayer(Player):
         print("Min",board_list,board_free_space)
         if self.is_winner(self.letter, board_list):
             utility = self.utilityFun(board_free_space, self.WIN)
-            print("W:",utility)
+            # print("W:",utility)
             return utility
         if self.is_opponent_winner(board_list):
             utility = self.utilityFun(board_free_space, self.LOSE)
-            print("L:",utility)
+            # print("L:",utility)
             return {utility:board_list}
         if self.drawEval(board_free_space, board_list):
             return {0:board_list}        
