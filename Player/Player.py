@@ -37,7 +37,7 @@ class HumanPlayer(Player):
         print ("Please enter your move ", end = " ")
         square = input()
         while not self.checkIfSpaceEmpty(square):
-            print("Please select empty space")
+            print("Please select empty space",end = " ")
             square = input()
         self.board.board_data[int(square)-1] = self.board.h_letter
     
