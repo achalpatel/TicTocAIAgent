@@ -117,7 +117,7 @@ class SmartPlayer(Player):
         board_list = self.board.board_data.copy()
         print("Free space:",board_free_space)
         print("Board lIst: ", board_list)
-        if letter == "X":
+        if letter == "O":
             l = []
             local_dict = {}
             for val in board_free_space:                
@@ -125,15 +125,16 @@ class SmartPlayer(Player):
                 l.append(ans_dict)
                 for k in ans_dict.keys():
                     local_dict[k] = val
+            # print("local_dict",l)
             ans = self.findMax(l)
-            print(ans)
+            print("what?",ans)
             key_val=0
             for k in ans.keys():
                 key_val=local_dict[k]
                 print(key_val)
             return key_val
 
-        elif letter == "O":
+        elif letter == "X":
             l = []
             local_dict = {}
             for val in board_free_space:                
@@ -142,7 +143,7 @@ class SmartPlayer(Player):
                 for k in ans_dict.keys():
                     local_dict[k] = val
             ans = self.findMin(l)
-            print(ans)
+            print("what?",ans)
             key_val=0
             for k in ans.keys():
                 key_val=local_dict[k]
@@ -152,7 +153,7 @@ class SmartPlayer(Player):
     def maxFun(self, pos, board_list):          
         board_list[pos] = self.letter
         board_free_space = self.available_space_player(board_list)
-        print("Max",board_list,board_free_space)
+        # print("Max",board_list,board_free_space)
         if self.is_winner(self.letter, board_list):
             utility = self.utilityFun(board_free_space, self.WIN)
             # print("W:",utility)
@@ -168,22 +169,16 @@ class SmartPlayer(Player):
         for val in board_free_space:
             ans_dict = self.minFun(val, board_list.copy())
             l.append(ans_dict)
-        # maxk=-math.inf
-        # boardk = []
-        # for d in l:
-        #     for x,y in d.items():
-        #         if x>maxk:
-        #             maxk=x
-        #             boardk=y
-        # ans = {maxk:boardk}
-        ans = self.findMax(l)
+        
+        ans = self.findMin(l)
+        # print("list - max",l, "ans: ")
         return ans
             
     
     def minFun(self, pos, board_list):
         board_list[pos] = self.opp_letter
         board_free_space = self.available_space_player(board_list)
-        print("Min",board_list,board_free_space)
+        # print("Min",board_list,board_free_space)
         if self.is_winner(self.letter, board_list):
             utility = self.utilityFun(board_free_space, self.WIN)
             # print("W:",utility)
@@ -198,14 +193,7 @@ class SmartPlayer(Player):
         for val in board_free_space:
             ans_dict = self.maxFun(val, board_list.copy())
             l.append(ans_dict)
-        # mink=math.inf
-        # boardk = []
-        # for d in l:
-        #     for x,y in d.items():
-        #         if x<mink:
-        #             mink=x
-        #             boardk=y
-        # ans = {mink:boardk}
-        ans = self.findMin(l)
+        # print("list - min",l)
+        ans = self.findMax(l)
         return ans
                 

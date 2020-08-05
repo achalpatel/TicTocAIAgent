@@ -6,9 +6,9 @@ from pathlib import Path
 
 
 # board_data = ['X','-','-','-','X','O','X','O','O']
-# board_data = ['-','-','-','-','-','-','-','-','-']
-board_data = ['X', 'X', 'O', '-', '-', '-', '-', '-', 'O']
-#board_data = ['X','O','X','X','O',0,0,0,'O']
+board_data = ['-','-','-','-','-','-','-','-','-']
+# board_data = ['-', 'X', 'O', '-', 'X', '-', 'X', 'O', 'O']
+# board_data = ['X','O','X','X','O',0,0,0,'O']
 board = TerminalBoard(board_data)
 
 board.play()
